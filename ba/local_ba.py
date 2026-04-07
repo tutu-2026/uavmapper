@@ -211,27 +211,6 @@ class LocalBundleAdjuster(BundleAdjusterBase):
             return {"success": False, "error": "没有有效的残差块"}
         
 
-
-        all_xyz = np.array([p for p in point_params_map.values()])
-        self.logger.info(f"3D点 X: min={all_xyz[:,0].min():.3f}, max={all_xyz[:,0].max():.3f}, mean={all_xyz[:,0].mean():.3f}")
-        self.logger.info(f"3D点 Y: min={all_xyz[:,1].min():.3f}, max={all_xyz[:,1].max():.3f}, mean={all_xyz[:,1].mean():.3f}")
-        self.logger.info(f"3D点 Z: min={all_xyz[:,2].min():.3f}, max={all_xyz[:,2].max():.3f}, mean={all_xyz[:,2].mean():.3f}")
-
-        # 检查 Z < 0 的点（在相机后方）
-        behind_camera = np.sum(all_xyz[:,2] < 0)
-        near_zero_z   = np.sum(np.abs(all_xyz[:,2]) < 0.01)
-        self.logger.info(f"Z < 0 的点: {behind_camera}, |Z| < 0.01 的点: {near_zero_z}")
-
-
-        all_cam = np.array([p for p in camera_params_map.values()])
-        self.logger.info(f"相机 rvec: min={all_cam[:,:3].min():.4f}, max={all_cam[:,:3].max():.4f}")
-        self.logger.info(f"相机 tvec: min={all_cam[:,3:].min():.4f}, max={all_cam[:,3:].max():.4f}")
-
-
-
-
-
-
         # ── 9. 配置并执行求解器 ───────────────────────────────────────────────────
         options = pyceres.SolverOptions()
         options.linear_solver_type = self.config.linear_solver_type
@@ -274,7 +253,6 @@ class LocalBundleAdjuster(BundleAdjusterBase):
                 continue
             
             view = views_to_optimize[image_id]
-            original_center = view.center.copy()
 
             rvec = params[:3].reshape(3, 1)
             tvec = params[3:].reshape(3, 1)
@@ -284,16 +262,11 @@ class LocalBundleAdjuster(BundleAdjusterBase):
             view.R = R
             view.t = tvec
 
-            # 计算变化
-            new_center = view.center
-            displacement = np.linalg.norm(new_center - original_center)
-            self.logger.info(f"图像 {image_id} 相机中心位移: {displacement:.6f}")
-
-
         for point_id, params in point_params_map.items():
             if point_id in constant_points:
                 continue
             points_to_optimize[point_id].xyz = params.copy().astype(np.float32)
+
 
         # ── 11. 统计并返回 ────────────────────────────────────────────────────────
         elapsed_time = time.time() - start_time

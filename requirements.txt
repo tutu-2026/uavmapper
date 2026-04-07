@@ -1,0 +1,39 @@
+# 核心依赖
+numpy>=1.26.0
+opencv-python>=4.8.0
+scipy>=1.12.0
+matplotlib>=3.8.0
+pillow>=10.0.0
+tqdm>=4.66.0
+
+# 特征提取和匹配
+torch>=2.2.0  # 支持CUDA
+kornia>=0.7.0  # GPU加速SIFT特征提取
+faiss-gpu>=1.7.2  # GPU加速近似最近邻搜索
+
+# 几何验证和位姿估计
+pymagsac>=1.0.0  # 鲁棒几何验证
+
+# 集束调整
+pyceres>=0.0.4  # Ceres Solver的Python绑定
+
+# GPS坐标转换
+pyproj>=3.6.0  # WGS84到局部ENU坐标系转换
+
+# 图像元数据处理
+piexif>=1.1.3  # EXIF数据处理
+exifread>=3.0.0  # 备用EXIF读取库
+
+# 数据库
+# 使用Python内置的sqlite3，无需额外安装
+
+# 可选依赖
+# PyTorch相关库（如果使用深度学习功能）
+torchvision>=0.17.0
+tensorboard>=2.15.0
+
+# 开发工具
+pytest>=7.4.0  # 单元测试
+black>=24.0.0  # 代码格式化
+mypy>=1.8.0  # 类型检查
+pylint>=3.0.0  # 代码分析
